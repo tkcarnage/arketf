@@ -1,96 +1,36 @@
 import fs from 'fs';
-import fastcsv from 'fast-csv';
-import dotenv from 'dotenv';
+import path from 'path';
+import { parse } from 'fast-csv';
+import db from './config';
 
-dotenv.config();
+const csvDir = path.join(__dirname + '/arkcsv/');
+const arketfs = ['ARKK', 'ARKQ', 'ARKW', 'ARKG', 'ARKF'];
 
-const Pool = require("pg").Pool;
-
-// remove the first line: header
-csvData.shift();
-
-// create a new connection pool to the database
-const pool = new Pool({
-  host: "localhost",
-  user: "postgres",
-  database: "testdb",
-  password: "123",
-  port: 5432
-});
-
-const query =
-  "INSERT INTO category (id, name, description, created_at) VALUES ($1, $2, $3, $4)";
-
-pool.connect((err, client, done) => {
-  if (err) throw err;
-  try {
-    csvData.forEach(row => {
-      client.query(query, row, (err, res) => {
-        if (err) {
-          console.log(err.stack);
-        } else {
-          console.log("inserted " + res.rowCount + " row:", row);
-        }
-      });
+// Drop and create tables then insert rows
+const dropTableQuery = `DROP TABLE IF EXISTS ${arketfs[0]}, ${arketfs[1]}, ${arketfs[2]}, ${arketfs[3]}, ${arketfs[4]}`;
+// drop tables
+db.none(dropTableQuery)
+  .then(res => {
+    // Create tables
+    console.log('DROPPED TABLES...');
+    const arketfTablesPromises = arketfs.map(etf => {
+      const createTableQuery = `CREATE TABLE ${etf} (id INT GENERATED ALWAYS AS IDENTITY, date DATE, fund VARCHAR, company VARCHAR, ticker VARCHAR, cusip VARCHAR, shares BIGINT, market_value NUMERIC(2), weight NUMERIC(2))`;
+      return db.none(createTableQuery);
     });
-  } finally {
-    done();
-  }
-});
-In the code above, we iterate over csvData array, each row will be saved to PostgreSQL using pg client pool.
-
-done() function is used to release the client when process finishes.
-
-More details about Pooling with pg could be find at:
-https://node-postgres.com/features/pooling.
-
-Write full code
-The whole code looks like:
-
-const fs = require("fs");
-const Pool = require("pg").Pool;
-const fastcsv = require("fast-csv");
-
-let stream = fs.createReadStream("bezkoder.csv");
-let csvData = [];
-let csvStream = fastcsv
-  .parse()
-  .on("data", function(data) {
-    csvData.push(data);
+    return Promise.all(arketfTablesPromises);
   })
-  .on("end", function() {
-    // remove the first line: header
-    csvData.shift();
-
-    // create a new connection to the database
-    const pool = new Pool({
-      host: "localhost",
-      user: "postgres",
-      database: "testdb",
-      password: "123",
-      port: 5432
+  .then(res => {
+    // insert rows
+    // headers for csv --> date,fund,company,ticker,cusip,shares,"market value($)",weight(%)
+    console.log('CREATED TABLES...');
+    arketfs.forEach(etf => {
+      const copyQuery = `COPY ${etf} FROM ‘${csvDir}${etf}’`
+      db.one(copyQuery)
+        .on('error', error => console.error(error))
+        .on('data', data => console.log(data))
+        .on('end', rowCount => console.log(rowCount));
     });
-
-    const query =
-      "INSERT INTO category (id, name, description, created_at) VALUES ($1, $2, $3, $4)";
-
-    pool.connect((err, client, done) => {
-      if (err) throw err;
-
-      try {
-        csvData.forEach(row => {
-          client.query(query, row, (err, res) => {
-            if (err) {
-              console.log(err.stack);
-            } else {
-              console.log("inserted " + res.rowCount + " row:", row);
-            }
-          });
-        });
-      } finally {
-        done();
-      }
-    });
+  })
+  .catch(err => {
+    return err;
   });
-
-stream.pipe(csvStream);

@@ -7,6 +7,7 @@ const app = express();
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
 
+// Used to test connection
 // app.get('/api/greeting', (req, res) => {
 //   const name = req.query.name || 'World';
 //   res.setHeader('Content-Type', 'application/json');
@@ -21,5 +22,5 @@ app.use(bodyParser.urlencoded({ extended: true }));
 
 // Start server
 app.listen(process.env.PORT || 3001, () => {
-  console.log(`Server listening`);
+  console.log(`Server listening on port ${process.env.PORT || 3001}`);
 });
