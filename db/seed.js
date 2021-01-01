@@ -1,21 +1,19 @@
-import fs from 'fs';
+// import fs from 'fs';
 import path from 'path';
-import { parse } from 'fast-csv';
+// import { parse } from 'fast-csv';
 import db from './config';
 
-const csvDir = path.join(__dirname + '/arkcsv/');
-const arketfs = ['arkk', 'arkq', 'arkw', 'arkg', 'arkf'];
+const csvDir = path.resolve(`${__dirname}/arkcsv/`);
+// const arketfs = ['arkk', 'arkq', 'arkw', 'arkg', 'arkf'];
 
-// Drop and create tables then insert rows
+// Drop and create tables then copy CSVs
 async function dropTables() {
   const dropTableQuery = `DROP TABLE IF EXISTS arkk, arkq, arkw, arkg, arkf`;
   try {
-
-    await db.none(dropTableQuery)
-      .catch(err => {
-        throw err;
-      })
-  } catch(err) {
+    await db.none(dropTableQuery).catch((err) => {
+      throw err;
+    });
+  } catch (err) {
     console.log(err);
   }
 }
@@ -27,27 +25,22 @@ async function createTables() {
   const createTableArkqQuery = `CREATE TABLE arkq (date TEXT, fund VARCHAR, company VARCHAR, ticker VARCHAR, cusip VARCHAR, shares NUMERIC(40,2), market_value NUMERIC(40,2), weight NUMERIC(5,2))`;
   const createTableArkwQuery = `CREATE TABLE arkw (date TEXT, fund VARCHAR, company VARCHAR, ticker VARCHAR, cusip VARCHAR, shares NUMERIC(40,2), market_value NUMERIC(40,2), weight NUMERIC(5,2))`;
   try {
-    await db.none(createTableArkfQuery)
-      .catch(err => {
-        throw err;
-      })
-    await db.none(createTableArkgQuery)
-      .catch(err => {
-        throw err;
-      })
-    await db.none(createTableArkkQuery)
-      .catch(err => {
-        throw err;
-      })
-    await db.none(createTableArkqQuery)
-      .catch(err => {
-        throw err;
-      })
-    await db.none(createTableArkwQuery)
-      .catch(err => {
-        throw err;
-      })
-  } catch(err) {
+    await db.none(createTableArkfQuery).catch((err) => {
+      throw err;
+    });
+    await db.none(createTableArkgQuery).catch((err) => {
+      throw err;
+    });
+    await db.none(createTableArkkQuery).catch((err) => {
+      throw err;
+    });
+    await db.none(createTableArkqQuery).catch((err) => {
+      throw err;
+    });
+    await db.none(createTableArkwQuery).catch((err) => {
+      throw err;
+    });
+  } catch (err) {
     console.log(err);
   }
 }
@@ -59,59 +52,33 @@ async function copyCSVs() {
   const copyArkqQuery = `COPY Arkq from '${csvDir}Arkq.csv' DELIMITER ',' CSV HEADER`;
   const copyArkwQuery = `COPY Arkw from '${csvDir}Arkw.csv' DELIMITER ',' CSV HEADER`;
   try {
-    await db.none(copyArkfQuery)
-      .then(data => {
-        console.log(`Copied: Arkf`)
-      })
-      .catch(err => {
-        throw err
-      })
-    await db.none(copyArkgQuery)
-      .then(data => {
-        console.log(`Copied: Arkg`)
-      })
-      .catch(err => {
-        throw err
-      });
-    await db.none(copyArkkQuery)
-      .then(data => {
-        console.log(`Copied: Arkk`)
-      })
-      .catch(err => {
-        throw err
-      });
-    await db.none(copyArkqQuery)
-      .then(data => {
-        console.log(`Copied: Arkq`)
-      })
-      .catch(err => {
-        throw err
-      });
-    await db.none(copyArkwQuery)
-      .then(data => {
-        console.log(`Copied: Arkw`)
-      })
-      .catch(err => {
-        throw err
-      });
-  } catch(err) {
+    await db.none(copyArkfQuery).catch((err) => {
+      throw err;
+    });
+    await db.none(copyArkgQuery).catch((err) => {
+      throw err;
+    });
+    await db.none(copyArkkQuery).catch((err) => {
+      throw err;
+    });
+    await db.none(copyArkqQuery).catch((err) => {
+      throw err;
+    });
+    await db.none(copyArkwQuery).catch((err) => {
+      throw err;
+    });
+  } catch (err) {
     console.log(err);
   }
 }
 
 async function runSeed() {
-  await dropTables()
-    .then(() => {
-      console.log('*****DROPPED TABLES*****')
-    });
-  await createTables()
-    .then(() => {
-      console.log('*****CREATED TABLES*****')
-    });
-  await copyCSVs()
-    .then(() => {
-      console.log('*****FINISHED*****')
-    });
+  await dropTables();
+  console.log('*****DROPPED TABLES*****');
+  await createTables();
+  console.log('*****CREATED TABLES*****');
+  await copyCSVs();
+  console.log('*****FINISHED*****');
 }
 
 runSeed();
