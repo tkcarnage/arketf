@@ -1,10 +1,7 @@
-// import fs from 'fs';
 import path from 'path';
-// import { parse } from 'fast-csv';
 import db from './config';
 
 const csvDir = path.resolve(`${__dirname}/arkcsv/`);
-// const arketfs = ['arkk', 'arkq', 'arkw', 'arkg', 'arkf'];
 
 // Drop and create tables then copy CSVs
 async function dropTables() {
