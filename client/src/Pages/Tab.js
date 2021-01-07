@@ -12,13 +12,28 @@ function Tab(props) {
           </NavLink>
         </li>
         <li>
-          <NavLink to="/about" activeClassName="selected">
-            About
+          <NavLink to="/arkf" activeClassName="selected">
+            ARKF
           </NavLink>
         </li>
         <li>
-          <NavLink to="/dashboard" activeClassName="selected">
-            Dashboard
+          <NavLink to="/arkg" activeClassName="selected">
+            ARKG
+          </NavLink>
+        </li>
+        <li>
+          <NavLink to="/arkk" activeClassName="selected">
+            ARKK
+          </NavLink>
+        </li>
+        <li>
+          <NavLink to="/arkq" activeClassName="selected">
+            ARKQ
+          </NavLink>
+        </li>
+        <li>
+          <NavLink to="/arkw" activeClassName="selected">
+            ARKW
           </NavLink>
         </li>
       </ul>
