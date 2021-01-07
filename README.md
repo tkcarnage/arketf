@@ -7,3 +7,9 @@
 5. `npm i`
 6. `cd ..`
 7. `npm run dev`
+
+postgres
+
+pg_ctl -D /usr/local/var/postgres start
+psql
+createdb ark_development_api;
